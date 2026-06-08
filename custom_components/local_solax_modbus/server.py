@@ -26,7 +26,8 @@ _LOGGER = logging.getLogger(__name__)
 
 # Modbus TCP ADU layout:
 # [transaction_id(2)] [protocol_id(2)=0x0000] [length(2)] [unit_id(1)] [func_code(1)] [data(n)]
-_MBAP_HEADER_SIZE = 6
+# The MBAP header is 7 bytes (the length field counts unit_id + PDU).
+_MBAP_HEADER_SIZE = 7
 _MIN_ADU_SIZE = 8
 
 # Function codes safe to cache (reads)
@@ -226,7 +227,7 @@ class ModbusTCPProxy:
                     break
 
                 pdu_bytes = await reader.readexactly(length - 1)
-                adu = header_bytes + bytes([uid]) + pdu_bytes
+                adu = header_bytes + pdu_bytes
 
                 self.stats.downstream_requests += 1
 
@@ -240,6 +241,8 @@ class ModbusTCPProxy:
                 await writer.drain()
         except (asyncio.IncompleteReadError, ConnectionResetError, OSError):
             pass
+        except Exception:  # noqa: BLE001
+            _LOGGER.exception("Unexpected error handling downstream client %s", addr)
         finally:
             _LOGGER.debug("Downstream client disconnected: %s", addr)
             writer.close()
@@ -310,12 +313,12 @@ class ModbusTCPProxy:
                     self._upstream_reader.readexactly(_MBAP_HEADER_SIZE),
                     timeout=self._connect_timeout,
                 )
-                _, _, resp_length, resp_uid = _parse_mbap(resp_header)
+                _, _, resp_length, _ = _parse_mbap(resp_header)
                 resp_rest = await asyncio.wait_for(
                     self._upstream_reader.readexactly(resp_length - 1),
                     timeout=self._connect_timeout,
                 )
-                return resp_header + bytes([resp_uid]) + resp_rest
+                return resp_header + resp_rest
 
             except (OSError, asyncio.TimeoutError, asyncio.IncompleteReadError) as exc:
                 self.stats.upstream_errors += 1

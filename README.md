@@ -2,6 +2,8 @@
 
 Home Assistant integration that acts as a Modbus-TCP caching proxy ("machine in the middle") between the [`solax_modbus`](https://github.com/wills106/homeassistant-solax-modbus) integration and your inverter's Wi-Fi dongle. The proxy holds a single persistent connection to the dongle, rate-limits and caches register reads, and passes writes through immediately — so the dongle is never overloaded while full read **and** write/control functionality is preserved. Works with any inverter supported by `solax_modbus` over its TCP interface (SolaX, Solis, and more). Based on the work of [@wills106](https://github.com/wills106/homeassistant-solax-modbus) & [@Rapsssito](https://github.com/Rapsssito/local-solis-ginglong-inverter).
 
+> **Note:** This is a "vibe-coded" project — built quickly and largely with the help of AI coding assistants. It works for the author's setup but has not been exhaustively tested across devices. Use at your own risk, and please report issues or open PRs if something doesn't work for you.
+
 ## Table of Contents<!-- omit in toc -->
 - [Installation](#installation)
 - [Getting started](#getting-started)
