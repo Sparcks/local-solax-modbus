@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v1.0.1 (2026-06-08)
+
+### Bug Fixes
+
+- Fix MBAP header size: the proxy read only 6 bytes but parsed 7, raising a
+  `struct.error` on every downstream request ("Unhandled exception in
+  client_connected_cb") and leaving `solax_modbus` with no response. Now reads
+  the full 7-byte MBAP header (incl. unit id) and removes the duplicate
+  unit-byte concatenation in downstream/upstream ADU reconstruction.
+- Log unexpected downstream handler errors instead of crashing the asyncio
+  client callback.
+
+
 ## v1.0.0 (2026-06-08)
 
 ### Features
