@@ -1,0 +1,26 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Device is already configured"
+    },
+    "error": {
+      "invalid_dongle_host": "Dongle IP address cannot be blank",
+      "unknown": "Unexpected error"
+    },
+    "step": {
+      "user": {
+        "title": "Local Solax ModBus Proxy",
+        "description": "Configure the Modbus-TCP caching proxy. Point the solax_modbus integration at 127.0.0.1 and the listen port once setup is complete.",
+        "data": {
+          "dongle_host": "Dongle IP address",
+          "dongle_port": "Dongle Modbus TCP port",
+          "listen_port": "Proxy listen port",
+          "cache_ttl": "Cache TTL (seconds)",
+          "min_upstream_interval": "Minimum upstream request interval (seconds)",
+          "connect_timeout": "Connect timeout (seconds)",
+          "reconnect_delay": "Reconnect delay (seconds)"
+        }
+      }
+    }
+  }
+}

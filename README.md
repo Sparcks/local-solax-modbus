@@ -1,6 +1,6 @@
-# Local Solis/Ginglong Inverter Logger via LAN for Home Assistant<!-- omit in toc -->
+# Local Solax ModBus — Modbus-TCP Caching Proxy for Home Assistant<!-- omit in toc -->
 
-Home Assistant integration for Solis/Ginglong inverters using the Wi-Fi datalogger. This integration creates a fake Solis server that listens to the datalogger's requests and responds accordingly, serving as a "machine in the middle attack" to intercept the data. The server is then able to send the data to Home Assistant and also optionally forward the data to the Solis cloud (if you still want to use the Solis app at the same time). This enables the use of the Solis/Ginglong inverter without the need for an outbound connection to the internet. The integration is based on the work of [@planetmarshall](https://github.com/planetmarshall/solis-service).
+Home Assistant integration that acts as a Modbus-TCP caching proxy ("machine in the middle") between the [`solax_modbus`](https://github.com/wills106/homeassistant-solax-modbus) integration and your inverter's Wi-Fi dongle. The proxy holds a single persistent connection to the dongle, rate-limits and caches register reads, and passes writes through immediately — so the dongle is never overloaded while full read **and** write/control functionality is preserved. Works with any inverter supported by `solax_modbus` over its TCP interface (SolaX, Solis, and more). Based on the work of [@wills106](https://github.com/wills106/homeassistant-solax-modbus) & [@Rapsssito](https://github.com/Rapsssito/local-solis-ginglong-inverter).
 
 ## Table of Contents<!-- omit in toc -->
 - [Installation](#installation)
@@ -18,19 +18,26 @@ For manual installation, copy all the folders inside `custom_components/` and al
 ## Getting started
 
 1. Install the integration through HACS or manually as described above.
-2. Configure the integration in Home Assistant. Go to Settings > Devices & Services > Local Solis/Ginglong Inverter. Enter the port you want to use for the server.
-3. Configure the inverter's Wi-Fi datalogger to connect to your HA server IP address and the port you configured in the previous step.
-4. Wait for the inverter to send data to the server (it might take a few minutes). You should see the data in Home Assistant. The integration will create a new device with all the sensors available in the inverter.
+2. Configure the integration in Home Assistant. Go to **Settings → Devices & Services → Add Integration → Local Solax ModBus**. Fill in:
+   - **Dongle IP address** — the LAN IP of your inverter's Wi-Fi dongle
+   - **Dongle Modbus TCP port** — usually `502`
+   - **Proxy listen port** — the local port HA will listen on (e.g. `5020`); must not conflict with other services
+   - Optional tuning: Cache TTL (default 5 s), Minimum upstream interval (default 1 s), Connect timeout, Reconnect delay
+3. In your existing `solax_modbus` integration options, change the TCP **host** to `127.0.0.1` (or your HA machine's IP if `solax_modbus` runs on a different host) and the **port** to the proxy listen port chosen above.
+4. Restart Home Assistant if needed. The proxy will connect to the dongle and serve cached register reads to `solax_modbus`. A **Local Solax ModBus Proxy** device will appear with diagnostic sensors (dongle online, cache hit ratio, upstream request count, etc.).
 
 ## Tested devices
 
-_I was only able to test the integration with my own inverter. If you have a different model, please let me know if it works or not._
+_This proxy is protocol-transparent and works with any inverter that the `solax_modbus` integration supports over its Modbus TCP interface. The table below tracks confirmed dongle/firmware combinations._
 
-| Device              | Firmware version | Tested |
-| ------------------- | ---------------- | ------ |
-| S5-GR1P(0.7-3.6)K-M | v1.0             | ✅      |
+| Inverter / Dongle          | Firmware version | Tested |
+| -------------------------- | ---------------- | ------ |
+| _Your device here — PRs welcome_ | —           | —      |
 
 
 ## Acknowledgements
 
-This would not be possible without the great work published by [@planetmarshall](https://github.com/planetmarshall/solis-service) for reverse engineering the protocol ([link to the blog post](https://www.algodynamic.co.uk/reverse-engineering-the-solisginlong-inverter-protocol.html)).
+This would not be possible without the great work of:
+- [@wills106](https://github.com/wills106/homeassistant-solax-modbus) for the `homeassistant-solax-modbus` integration.
+- [@Rapsssito](https://github.com/Rapsssito/local-solis-ginglong-inverter) for the original Local Solis/Ginglong Inverter integration that inspired the packaging approach.
+- [@planetmarshall](https://github.com/planetmarshall/solis-service) for reverse engineering the Solis/Ginglong datalogger protocol.

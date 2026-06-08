@@ -1,5 +1,5 @@
 {
-    "name": "Local Solis/Ginglong Inverter",
+    "name": "Local Solax ModBus",
     "homeassistant": "2024.1.0",
     "render_readme": true
 }

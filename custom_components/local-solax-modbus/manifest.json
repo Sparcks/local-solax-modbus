@@ -1,0 +1,13 @@
+{
+  "domain": "local_solax_modbus",
+  "name": "Local Solax ModBus",
+  "codeowners": ["@Sparcks"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/Sparcks/local-solax-modbus",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/Sparcks/local-solax-modbus/issues",
+  "loggers": ["custom_integration.local_solax_modbus"],
+  "requirements": [],
+  "version": "1.0.0"
+}
