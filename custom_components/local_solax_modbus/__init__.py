@@ -38,7 +38,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up the proxy from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
-    cfg = entry.data
+    cfg = {**entry.data, **entry.options}
     proxy = ModbusTCPProxy(
         listen_host="0.0.0.0",  # noqa: S104
         listen_port=cfg.get(CONF_LISTEN_PORT, DEFAULT_LISTEN_PORT),
@@ -55,7 +55,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+
     return True
+
+
+async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload the proxy when options are changed."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

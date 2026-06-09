@@ -1,4 +1,17 @@
 {
+  "options": {
+    "step": {
+      "init": {
+        "title": "Local Solax ModBus — Proxy options",
+        "data": {
+          "cache_ttl": "Cache TTL (seconds)",
+          "min_upstream_interval": "Minimum upstream request interval (seconds)",
+          "connect_timeout": "Connect timeout (seconds)",
+          "reconnect_delay": "Reconnect delay (seconds)"
+        }
+      }
+    }
+  },
   "config": {
     "abort": {
       "already_configured": "Device is already configured"
